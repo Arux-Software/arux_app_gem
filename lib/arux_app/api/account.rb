@@ -12,11 +12,12 @@ module AruxApp
         end
       end
 
-      attr_accessor :auth, :access_token
+      attr_accessor :auth, :access_token, :api_version
 
       def initialize(options = {})
         self.auth         = options[:auth]
         self.access_token = options[:access_token]
+        self.api_version  = options[:api_version] || 1.2
 
         raise API::InitializerError.new(:auth_or_access_token, "can't be blank") if self.auth.nil? and self.access_token.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if self.auth and !self.auth.is_a?(AruxApp::API::Auth)
@@ -25,7 +26,7 @@ module AruxApp
 
       def list(params = {})
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users"
+        request.url = "#{api_route}/users"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
@@ -42,7 +43,7 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
+        request.url = "#{api_route}/users/#{uuid}"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
@@ -57,7 +58,7 @@ module AruxApp
 
       def create(params)
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/"
+        request.url = "#{api_route}/users/"
         request.body = params
         request.headers = self.generate_headers
 
@@ -76,7 +77,7 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
+        request.url = "#{api_route}/users/#{uuid}"
         request.body = params
         request.headers = self.generate_headers
 
@@ -96,7 +97,7 @@ module AruxApp
         uuid2 = URI.escape(uuid2)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/merge/#{uuid1}/#{uuid2}"
+        request.url = "#{api_route}/users/merge/#{uuid1}/#{uuid2}"
         request.headers = self.generate_headers
 
         response = HTTPI.put(request)
@@ -112,7 +113,7 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
+        request.url = "#{api_route}/users/#{uuid}"
         request.headers = self.generate_headers
 
         response = HTTPI.delete(request)
@@ -128,7 +129,7 @@ module AruxApp
         raise API::RequirementError.new(:access_token, "can't be blank") if self.access_token.nil?
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/owner"
+        request.url = "#{api_route}/users/owner"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
@@ -155,6 +156,10 @@ module AruxApp
       end
 
       protected
+
+      def api_route
+        "#{self.class.server_uri}/api/v#{api_version}"
+      end
 
       def generate_headers
         if self.access_token
