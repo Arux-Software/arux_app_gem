@@ -59,7 +59,7 @@ module AruxApp
       def create(params)
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/"
-        request.body = params
+        request.body = params.to_json
         request.headers = self.generate_headers
 
         response = HTTPI.post(request)
@@ -78,7 +78,7 @@ module AruxApp
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
-        request.body = params
+        request.body = params.to_json
         request.headers = self.generate_headers
 
         response = HTTPI.put(request)
@@ -146,7 +146,7 @@ module AruxApp
         uuid = URI.escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{user_uuid}/user_locks"
+        request.url = "#{api_route}/users/#{user_uuid}/locks"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -162,13 +162,13 @@ module AruxApp
         uuid = URI.escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}/user_locks"
+        request.url = "#{api_route}/users/#{uuid}/locks"
         request.body = {
-          user_locks: {
+          user_lock: {
             scope: scope,
             reason: reason
           }
-        }
+        }.to_json
         request.headers = self.generate_headers
 
         response = HTTPI.post(request)
@@ -186,7 +186,7 @@ module AruxApp
         uuid = URI.escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}/user_locks/#{lock_id}"
+        request.url = "#{api_route}/users/#{uuid}/locks/#{lock_id}"
         request.headers = self.generate_headers
 
         response = HTTPI.delete(request)
@@ -219,9 +219,9 @@ module AruxApp
 
       def generate_headers
         if self.access_token
-          {'User-Agent' => USER_AGENT, 'Authorization' => self.access_token.token}
+          {'User-Agent' => USER_AGENT, 'Authorization' => self.access_token.token, 'Content-Type' => "application/json"}
         else
-          {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id}
+          {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id, 'Content-Type' => "application/json"}
         end
       end
 
