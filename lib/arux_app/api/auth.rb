@@ -32,7 +32,7 @@ module AruxApp
           "https://sso.arux.blue"
         elsif AruxApp::API.devmode?
           host = ENV.fetch("DEV_HOST") || "#{`scutil --get LocalHostName`.downcase.strip}.local"
-          "http://sso.#{host}"
+          "https://sso.#{host}"
         end
       end
 
