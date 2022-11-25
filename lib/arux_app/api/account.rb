@@ -64,7 +64,7 @@ module AruxApp
 
         response = HTTPI.post(request)
 
-        if rseponse.code == 201
+        if response.code == 201
           true
         elsif !response.error?
           JSON.parse(response.body)
@@ -147,7 +147,6 @@ module AruxApp
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{user_uuid}/user_locks"
-        request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -174,7 +173,7 @@ module AruxApp
 
         response = HTTPI.post(request)
 
-        if rseponse.code == 201
+        if response.code == 201
           true
         elsif !response.error?
           JSON.parse(response.body)
