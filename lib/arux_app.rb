@@ -24,3 +24,11 @@ end
 if ENV['ARUX_APP_GEM_DEV_MODE'].to_s == "true"
   AruxApp::API.devmode = true
 end
+
+if ENV.has_key?("DEV_HOST")
+  HOSTNAME = ENV.fetch("DEV_HOST")
+elsif RUBY_PLATFORM =~ /darwin/
+  HOSTNAME = "#{`scutil --get LocalHostName`.downcase.strip}.local"
+else
+  HOSTNAME = `hostname`.downcase.strip
+end

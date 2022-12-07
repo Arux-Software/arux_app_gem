@@ -7,8 +7,7 @@ module AruxApp
         elsif AruxApp::API.testmode?
           "https://cart.arux.blue"
         elsif AruxApp::API.devmode?
-          host = ENV.fetch("DEV_HOST") || "#{`scutil --get LocalHostName`.downcase.strip}.local"
-          "https://cart.#{host}"
+          "https://cart.#{HOSTNAME}"
         end
       end
 

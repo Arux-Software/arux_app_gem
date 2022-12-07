@@ -7,8 +7,7 @@ module AruxApp
         elsif AruxApp::API.testmode?
           "https://acc.arux.blue"
         elsif AruxApp::API.devmode?
-          host = ENV.fetch("DEV_HOST") || "#{`scutil --get LocalHostName`.downcase.strip}.local"
-          "https://acc.#{host}"
+          "https://acc.#{HOSTNAME}"
         end
       end
 
