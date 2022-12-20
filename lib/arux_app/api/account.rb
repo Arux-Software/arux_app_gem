@@ -7,16 +7,16 @@ module AruxApp
         elsif AruxApp::API.testmode?
           "https://acc.arux.blue"
         elsif AruxApp::API.devmode?
-          host = ENV.fetch("DEV_HOST") || "#{`scutil --get LocalHostName`.downcase.strip}.local"
-          "http://acc.#{host}"
+          "https://acc.#{HOSTNAME}"
         end
       end
 
-      attr_accessor :auth, :access_token
+      attr_accessor :auth, :access_token, :api_version
 
       def initialize(options = {})
         self.auth         = options[:auth]
         self.access_token = options[:access_token]
+        self.api_version  = options[:api_version] || 1.2
 
         raise API::InitializerError.new(:auth_or_access_token, "can't be blank") if self.auth.nil? and self.access_token.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if self.auth and !self.auth.is_a?(AruxApp::API::Auth)
@@ -25,7 +25,7 @@ module AruxApp
 
       def list(params = {})
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users"
+        request.url = "#{api_route}/users"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
@@ -42,7 +42,7 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
+        request.url = "#{api_route}/users/#{uuid}"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
@@ -57,13 +57,13 @@ module AruxApp
 
       def create(params)
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/"
-        request.body = params
+        request.url = "#{api_route}/users/"
+        request.body = params.to_json
         request.headers = self.generate_headers
 
         response = HTTPI.post(request)
 
-        if rseponse.code == 201
+        if response.code == 201
           true
         elsif !response.error?
           JSON.parse(response.body)
@@ -76,8 +76,8 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
-        request.body = params
+        request.url = "#{api_route}/users/#{uuid}"
+        request.body = params.to_json
         request.headers = self.generate_headers
 
         response = HTTPI.put(request)
@@ -96,7 +96,7 @@ module AruxApp
         uuid2 = URI.escape(uuid2)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/merge/#{uuid1}/#{uuid2}"
+        request.url = "#{api_route}/users/merge/#{uuid1}/#{uuid2}"
         request.headers = self.generate_headers
 
         response = HTTPI.put(request)
@@ -112,7 +112,7 @@ module AruxApp
         uuid = URI.escape(uuid.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/#{uuid}"
+        request.url = "#{api_route}/users/#{uuid}"
         request.headers = self.generate_headers
 
         response = HTTPI.delete(request)
@@ -128,11 +128,67 @@ module AruxApp
         raise API::RequirementError.new(:access_token, "can't be blank") if self.access_token.nil?
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/api/v1/users/owner"
+        request.url = "#{api_route}/users/owner"
         request.query = URI.encode_www_form(params)
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
+
+        if !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
+      def list_user_locks(user_uuid)
+        uuid = URI.escape(user_uuid.to_s)
+
+        request = HTTPI::Request.new
+        request.url = "#{api_route}/users/#{user_uuid}/locks"
+        request.headers = self.generate_headers
+
+        response = HTTPI.get(request)
+
+        if !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
+      def add_user_lock(user_uuid, scope, reason = "")
+        uuid = URI.escape(user_uuid.to_s)
+
+        request = HTTPI::Request.new
+        request.url = "#{api_route}/users/#{uuid}/locks"
+        request.body = {
+          user_lock: {
+            scope: scope,
+            reason: reason
+          }
+        }.to_json
+        request.headers = self.generate_headers
+
+        response = HTTPI.post(request)
+
+        if response.code == 201
+          true
+        elsif !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
+      def delete_user_lock(user_uuid, lock_id)
+        uuid = URI.escape(user_uuid.to_s)
+
+        request = HTTPI::Request.new
+        request.url = "#{api_route}/users/#{uuid}/locks/#{lock_id}"
+        request.headers = self.generate_headers
+
+        response = HTTPI.delete(request)
 
         if !response.error?
           JSON.parse(response.body)
@@ -156,11 +212,15 @@ module AruxApp
 
       protected
 
+      def api_route
+        "#{self.class.server_uri}/api/v#{api_version}"
+      end
+
       def generate_headers
         if self.access_token
-          {'User-Agent' => USER_AGENT, 'Authorization' => self.access_token.token}
+          {'User-Agent' => USER_AGENT, 'Authorization' => self.access_token.token, 'Content-Type' => "application/json"}
         else
-          {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id}
+          {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id, 'Content-Type' => "application/json"}
         end
       end
 
