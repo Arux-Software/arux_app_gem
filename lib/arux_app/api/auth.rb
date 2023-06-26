@@ -25,6 +25,10 @@ module AruxApp
         end
       end
 
+      def self.server_uri
+        AruxApp::API.server_uri
+      end
+
       attr_accessor :client_id, :client_secret, :redirect_uri, :js_callback, :district_subdomain, :current_user_uuid, :login_mechanism, :element
 
       def initialize(options = {})

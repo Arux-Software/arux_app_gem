@@ -1,6 +1,10 @@
 module AruxApp
   module API
     class Account
+      def self.server_uri
+        AruxApp::API.server_uri
+      end
+
       attr_accessor :auth, :access_token, :api_version
 
       def initialize(options = {})
