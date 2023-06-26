@@ -15,6 +15,16 @@ module AruxApp
           @@mode = b ? m : :standard
         end
       end
+
+      def server_uri
+        if AruxApp::API.standardmode?
+          "https://account.arux.app"
+        elsif AruxApp::API.testmode?
+          "https://account.arux.blue"
+        elsif AruxApp::API.devmode?
+          "https://account.#{HOSTNAME}"
+        end
+      end
     end
     
     class Error < StandardError

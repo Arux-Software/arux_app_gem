@@ -1,16 +1,6 @@
 module AruxApp
   module API
     class Account
-      def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://acc.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://acc.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://acc.#{HOSTNAME}"
-        end
-      end
-
       attr_accessor :auth, :access_token, :api_version
 
       def initialize(options = {})

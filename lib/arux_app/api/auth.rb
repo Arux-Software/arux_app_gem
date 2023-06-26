@@ -25,16 +25,6 @@ module AruxApp
         end
       end
 
-      def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://sso.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://sso.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://sso.#{HOSTNAME}"
-        end
-      end
-
       attr_accessor :client_id, :client_secret, :redirect_uri, :js_callback, :district_subdomain, :current_user_uuid, :login_mechanism, :element
 
       def initialize(options = {})
