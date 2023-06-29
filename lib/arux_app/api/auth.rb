@@ -47,7 +47,7 @@ module AruxApp
       end
 
       def authorization_url
-        %(#{self.class.server_uri}/users/sign_in?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
+        %(#{self.class.server_uri}/oauth/authorize?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
       end
 
       def registration_url
@@ -64,7 +64,7 @@ module AruxApp
         }
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/access_token"
+        request.url = "#{self.class.server_uri}/oauth/token"
         request.body = data
         request.headers = {'User-Agent' => USER_AGENT}
 
