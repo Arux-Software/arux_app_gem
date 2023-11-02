@@ -145,6 +145,21 @@ module AruxApp
         end
       end
 
+      def destroy(uuid)
+        path = "/api/#{self.generate_cart_path}/carts/#{uuid}"
+        request = HTTPI::Request.new
+        request.url = "#{self.class.server_uri}#{path}"
+        request.headers = self.generate_headers
+
+        response = HTTPI.delete(request)
+
+        if !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+        end
+      end
+
       protected
 
       def generate_cart_path
