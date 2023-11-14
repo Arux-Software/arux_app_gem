@@ -160,6 +160,22 @@ module AruxApp
         end
       end
 
+      def create(params)
+        path = "/api/#{self.generate_cart_path}/carts"
+        request = HTTPI::Request.new
+        request.url = "#{self.class.server_uri}#{path}"
+        request.headers = self.generate_headers
+        request.body = params.to_json
+
+        response = HTTPI.post(request)
+
+        if !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+        end
+      end
+
       protected
 
       def generate_cart_path
