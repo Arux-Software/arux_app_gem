@@ -1,6 +1,6 @@
-require 'rubygems'
-require 'httpi'
-require 'json'
+require "rubygems"
+require "httpi"
+require "json"
 
 require "arux_app/api"
 
