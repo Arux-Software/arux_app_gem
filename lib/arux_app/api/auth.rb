@@ -87,6 +87,27 @@ module AruxApp
         end
       end
 
+      def client_credentials_token
+        data = {
+          scope: "public",
+          grant_type: "client_credentials",
+          client_id: client_id,
+          client_secret: client_secret
+        }
+
+        request = HTTPI::Request.new
+        request.url = "#{self.class.server_uri}/oauth/token"
+        request.body = data
+        request.headers = {'User-Agent' => USER_AGENT}
+
+        response = HTTPI.post(request)
+        if !response.error?
+          AccessToken.new(:token => JSON.parse(response.body)['access_token'], auth: self)
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
       def javascript
         options = {
           district: self.district_subdomain,
