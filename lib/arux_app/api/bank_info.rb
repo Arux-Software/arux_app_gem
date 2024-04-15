@@ -6,14 +6,14 @@ module AruxApp
       end
 
       def get(routing_number)
-        routing_number = URI.escape(routing_number.to_s)
+        routing_number = AruxApp::API.uri_escape(routing_number.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}/#{routing_number}"
         request.headers = {'User-Agent' => USER_AGENT}
 
         response = HTTPI.get(request)
-        
+
         if !response.error?
           JSON.parse(response.body)
         else
