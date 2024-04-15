@@ -27,6 +27,11 @@ module AruxApp
       end
 
       def uri_escape(str)
+        # URI.escape was deprecated and removed in ruby
+        # https://bugs.ruby-lang.org/issues/17309
+        # The alternatives suggested were using URI::DEFAULT_PARSER
+        # and CGI. This will use URI::DEFAULT_PARSER if it is defined and CGI
+        # if not.
         if URI.respond_to?(:escape)
           URI.escape(str)
         elsif defined? URI::DEFAULT_PARSER
