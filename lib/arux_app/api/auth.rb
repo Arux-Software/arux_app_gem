@@ -5,11 +5,12 @@ module AruxApp
       class InvalidClientError < API::Error; end
 
       class AccessToken
-        attr_accessor :token, :auth
+        attr_accessor :token, :auth, :scope
 
         def initialize(options = {})
           self.token = options[:token]
           self.auth = options[:auth]
+          self.scope = options[:scope]
 
           raise API::InitializerError.new(:token, "can't be blank") if self.token.to_s.empty?
           raise API::InitializerError.new(:auth, "can't be blank") if self.auth.nil?
@@ -71,7 +72,11 @@ module AruxApp
         response = HTTPI.post(request)
 
         if !response.error?
-          return AccessToken.new(:token => JSON.parse(response.body)['access_token'], :auth => self)
+          AccessToken.new(
+            token: JSON.parse(response.body)['access_token'],
+            scope: JSON.parse(response.body)['scope'],
+            auth: self
+          )
         else
           begin
             resp_data = JSON.parse(response.body)
