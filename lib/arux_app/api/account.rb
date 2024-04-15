@@ -10,7 +10,7 @@ module AruxApp
       def initialize(options = {})
         self.auth         = options[:auth]
         self.access_token = options[:access_token]
-        self.api_version  = options[:api_version] || 1.2
+        self.api_version  = options[:api_version] || 1.3
 
         raise API::InitializerError.new(:auth_or_access_token, "can't be blank") if self.auth.nil? and self.access_token.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if self.auth and !self.auth.is_a?(AruxApp::API::Auth)
