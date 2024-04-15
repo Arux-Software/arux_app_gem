@@ -47,8 +47,18 @@ module AruxApp
         raise API::InitializerError.new(:redirect_uri, "can't be blank") if self.redirect_uri.to_s.empty?
       end
 
-      def authorization_url
-        %(#{self.class.server_uri}/oauth/authorize?scope=public&response_type=code&client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
+      def authorization_url(scope: "public")
+        base_uri = URI.parse("#{self.class.server_uri}/oauth/authorize")
+        params = {
+          scope: scope,
+          response_type: "code",
+          client_id: client_id,
+          redirect_uri: redirect_uri,
+          district: district_subdomain,
+          state: scope
+        }
+        base_uri.query = URI.encode_www_form(params)
+        base_uri.to_s
       end
 
       def registration_url
