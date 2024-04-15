@@ -21,7 +21,7 @@ module AruxApp
       end
 
       def get(subdomain_or_sn)
-        subdomain_or_sn = URI.escape(subdomain_or_sn.to_s)
+        subdomain_or_sn = AruxApp::API.uri_escape(subdomain_or_sn.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}/v1/customers/#{subdomain_or_sn}"
@@ -37,8 +37,8 @@ module AruxApp
       end
 
       def get_by(key, value)
-        key = URI.escape(key.to_s)
-        value = URI.escape(value.to_s)
+        key = AruxApp::API.uri_escape(key.to_s)
+        value = AruxApp::API.uri_escape(value.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}/v1/customers/by/#{key}/#{value}"

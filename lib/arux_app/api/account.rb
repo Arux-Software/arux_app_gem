@@ -33,7 +33,7 @@ module AruxApp
       end
 
       def get(uuid, params = {})
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -67,7 +67,7 @@ module AruxApp
       end
 
       def update(uuid, params)
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -86,8 +86,8 @@ module AruxApp
       end
 
       def merge(uuid1, uuid2)
-        uuid1 = URI.escape(uuid1)
-        uuid2 = URI.escape(uuid2)
+        uuid1 = AruxApp::API.uri_escape(uuid1)
+        uuid2 = AruxApp::API.uri_escape(uuid2)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/merge/#{uuid1}/#{uuid2}"
@@ -103,7 +103,7 @@ module AruxApp
       end
 
       def delete(uuid)
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -136,7 +136,7 @@ module AruxApp
       end
 
       def list_user_locks(user_uuid)
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{user_uuid}/locks"
@@ -152,7 +152,7 @@ module AruxApp
       end
 
       def add_user_lock(user_uuid, scope, reason = "")
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}/locks"
@@ -176,7 +176,7 @@ module AruxApp
       end
 
       def delete_user_lock(user_uuid, lock_id)
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}/locks/#{lock_id}"
