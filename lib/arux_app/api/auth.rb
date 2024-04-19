@@ -54,8 +54,7 @@ module AruxApp
           response_type: "code",
           client_id: client_id,
           redirect_uri: redirect_uri,
-          district: district_subdomain,
-          state: scope
+          district: district_subdomain
         }
         base_uri.query = URI.encode_www_form(params)
         base_uri.to_s
