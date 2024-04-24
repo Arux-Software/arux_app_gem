@@ -60,6 +60,33 @@ module AruxApp
         base_uri.to_s
       end
 
+      def basic_authentication(username, password, scope = "public")
+        params = {
+          scope: scope,
+          grant_type: "password",
+          client_id: client_id,
+          redirect_uri: redirect_uri,
+          district: district_subdomain
+        }
+        request = HTTPI::Request.new
+        request.url = "#{self.class.server_uri}/oauth/token"
+        request.body = params
+        request.headers = { 'User-Agent' => USER_AGENT }
+        request.auth.basic(username, password)
+        response = HTTPI.post(request)
+
+        if !response.error?
+          AccessToken.new(
+            token: JSON.parse(response.body)['access_token'],
+            scope: JSON.parse(response.body)['scope'],
+            auth: self
+          )
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
+
       def registration_url
         %(#{self.class.server_uri}/users/registrations?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
       end
