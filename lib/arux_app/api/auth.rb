@@ -65,8 +65,7 @@ module AruxApp
           scope: scope,
           grant_type: "password",
           client_id: client_id,
-          redirect_uri: redirect_uri,
-          district: district_subdomain
+          client_secret: client_secret
         }
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}/oauth/token"
