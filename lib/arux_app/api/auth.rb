@@ -76,16 +76,13 @@ module AruxApp
         end
 
         response = HTTPI.post(request)
+        raise(API::Error.new(response.code, response.body)) if response.error?
 
-        if !response.error?
-          AccessToken.new(
-            token: JSON.parse(response.body)['access_token'],
-            scope: JSON.parse(response.body)['scope'],
-            auth: self
-          )
-        else
-          raise(API::Error.new(response.code, response.body))
-        end
+        AccessToken.new(
+          token: JSON.parse(response.body)['access_token'],
+          scope: JSON.parse(response.body)['scope'],
+          auth: self
+        )
       end
 
 
