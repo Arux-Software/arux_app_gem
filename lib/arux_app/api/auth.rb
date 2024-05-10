@@ -85,7 +85,6 @@ module AruxApp
         )
       end
 
-
       def registration_url
         %(#{self.class.server_uri}/users/registrations?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
       end
