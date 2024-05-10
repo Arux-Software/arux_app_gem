@@ -67,11 +67,14 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-        request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/oauth/token"
-        request.body = params
-        request.headers = { 'User-Agent' => USER_AGENT }
-        request.auth.basic(username, password)
+
+        request = HTTPI::Request.new.tap do |req|
+          req.url = "#{self.class.server_uri}/oauth/token"
+          req.body = params
+          req.headers = { 'User-Agent' => USER_AGENT }
+          req.auth.basic(username, password)
+        end
+
         response = HTTPI.post(request)
 
         if !response.error?
