@@ -23,7 +23,7 @@ module AruxApp
 
       def get(uuid = nil)
         if uuid
-          path = %(/api/#{URI.escape(uuid)})
+          path = %(/api/#{AruxApp::API.uri_escape(uuid)})
         else
           path = %(/api/#{self.generate_cart_path})
         end
@@ -110,7 +110,7 @@ module AruxApp
       end
 
       def update_item(item_identifier, params)
-        path = %(/api/#{self.generate_cart_path}/items/#{URI.escape(item_identifier)})
+        path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
 
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}#{path}"
@@ -130,7 +130,7 @@ module AruxApp
       end
 
       def delete_item(item_identifier)
-        path = %(/api/#{self.generate_cart_path}/items/#{URI.escape(item_identifier)})
+        path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
 
         request = HTTPI::Request.new
         request.url = "#{self.class.server_uri}#{path}"
@@ -179,7 +179,7 @@ module AruxApp
       protected
 
       def generate_cart_path
-        %(#{URI.escape(self.auth.district_subdomain)}/#{URI.escape(self.access_token.token)})
+        %(#{AruxApp::API.uri_escape(self.auth.district_subdomain)}/#{AruxApp::API.uri_escape(self.access_token.token)})
       end
 
       def generate_headers

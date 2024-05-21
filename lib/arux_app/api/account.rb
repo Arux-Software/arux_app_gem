@@ -2,13 +2,7 @@ module AruxApp
   module API
     class Account
       def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://acc.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://acc.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://acc.#{HOSTNAME}"
-        end
+        AruxApp::API.server_uri
       end
 
       attr_accessor :auth, :access_token, :api_version
@@ -16,7 +10,7 @@ module AruxApp
       def initialize(options = {})
         self.auth         = options[:auth]
         self.access_token = options[:access_token]
-        self.api_version  = options[:api_version] || 1.2
+        self.api_version  = options[:api_version] || 1.3
 
         raise API::InitializerError.new(:auth_or_access_token, "can't be blank") if self.auth.nil? and self.access_token.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if self.auth and !self.auth.is_a?(AruxApp::API::Auth)
@@ -39,7 +33,7 @@ module AruxApp
       end
 
       def get(uuid, params = {})
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -73,7 +67,7 @@ module AruxApp
       end
 
       def update(uuid, params)
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -92,8 +86,8 @@ module AruxApp
       end
 
       def merge(uuid1, uuid2)
-        uuid1 = URI.escape(uuid1)
-        uuid2 = URI.escape(uuid2)
+        uuid1 = AruxApp::API.uri_escape(uuid1)
+        uuid2 = AruxApp::API.uri_escape(uuid2)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/merge/#{uuid1}/#{uuid2}"
@@ -109,7 +103,7 @@ module AruxApp
       end
 
       def delete(uuid)
-        uuid = URI.escape(uuid.to_s)
+        uuid = AruxApp::API.uri_escape(uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}"
@@ -142,7 +136,7 @@ module AruxApp
       end
 
       def list_user_locks(user_uuid)
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{user_uuid}/locks"
@@ -158,7 +152,7 @@ module AruxApp
       end
 
       def add_user_lock(user_uuid, scope, reason = "")
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}/locks"
@@ -182,7 +176,7 @@ module AruxApp
       end
 
       def delete_user_lock(user_uuid, lock_id)
-        uuid = URI.escape(user_uuid.to_s)
+        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
 
         request = HTTPI::Request.new
         request.url = "#{api_route}/users/#{uuid}/locks/#{lock_id}"

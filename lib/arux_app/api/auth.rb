@@ -5,11 +5,12 @@ module AruxApp
       class InvalidClientError < API::Error; end
 
       class AccessToken
-        attr_accessor :token, :auth
+        attr_accessor :token, :auth, :scope
 
         def initialize(options = {})
           self.token = options[:token]
           self.auth = options[:auth]
+          self.scope = options[:scope]
 
           raise API::InitializerError.new(:token, "can't be blank") if self.token.to_s.empty?
           raise API::InitializerError.new(:auth, "can't be blank") if self.auth.nil?
@@ -26,13 +27,7 @@ module AruxApp
       end
 
       def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://sso.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://sso.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://sso.#{HOSTNAME}"
-        end
+        AruxApp::API.server_uri
       end
 
       attr_accessor :client_id, :client_secret, :redirect_uri, :js_callback, :district_subdomain, :current_user_uuid, :login_mechanism, :element
@@ -52,12 +47,46 @@ module AruxApp
         raise API::InitializerError.new(:redirect_uri, "can't be blank") if self.redirect_uri.to_s.empty?
       end
 
-      def authorization_url
-        %(#{self.class.server_uri}/authorize?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
+      def authorization_url(scope: "public")
+        base_uri = URI.parse("#{self.class.server_uri}/oauth/authorize")
+        params = {
+          scope: scope,
+          response_type: "code",
+          client_id: client_id,
+          redirect_uri: redirect_uri,
+          district: district_subdomain
+        }
+        base_uri.query = URI.encode_www_form(params)
+        base_uri.to_s
+      end
+
+      def basic_authentication(username, password, scope = "public")
+        params = {
+          scope: scope,
+          grant_type: "password",
+          client_id: client_id,
+          client_secret: client_secret
+        }
+
+        request = HTTPI::Request.new.tap do |req|
+          req.url = "#{self.class.server_uri}/oauth/token"
+          req.body = params
+          req.headers = { 'User-Agent' => USER_AGENT }
+          req.auth.basic(username, password)
+        end
+
+        response = HTTPI.post(request)
+        raise(API::Error.new(response.code, response.body)) if response.error?
+
+        AccessToken.new(
+          token: JSON.parse(response.body)['access_token'],
+          scope: JSON.parse(response.body)['scope'],
+          auth: self
+        )
       end
 
       def registration_url
-        %(#{self.class.server_uri}/register?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
+        %(#{self.class.server_uri}/users/registrations?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
       end
 
       def access_token(code)
@@ -70,14 +99,18 @@ module AruxApp
         }
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/access_token"
+        request.url = "#{self.class.server_uri}/oauth/token"
         request.body = data
         request.headers = {'User-Agent' => USER_AGENT}
 
         response = HTTPI.post(request)
 
         if !response.error?
-          return AccessToken.new(:token => JSON.parse(response.body)['access_token'], :auth => self)
+          AccessToken.new(
+            token: JSON.parse(response.body)['access_token'],
+            scope: JSON.parse(response.body)['scope'],
+            auth: self
+          )
         else
           begin
             resp_data = JSON.parse(response.body)
@@ -90,6 +123,27 @@ module AruxApp
           else
             raise(API::Error.new(response.code, response.body))
           end
+        end
+      end
+
+      def client_credentials_token
+        data = {
+          scope: "public",
+          grant_type: "client_credentials",
+          client_id: client_id,
+          client_secret: client_secret
+        }
+
+        request = HTTPI::Request.new
+        request.url = "#{self.class.server_uri}/oauth/token"
+        request.body = data
+        request.headers = {'User-Agent' => USER_AGENT}
+
+        response = HTTPI.post(request)
+        if !response.error?
+          AccessToken.new(:token => JSON.parse(response.body)['access_token'], auth: self)
+        else
+          raise(API::Error.new(response.code, response.body))
         end
       end
 
