@@ -1,8 +1,12 @@
 module AruxApp
   module API
     class BankInfo
-      def self.server_uri
-        "https://banks.api.arux.app"
+      def self.public_uri
+        AruxApp::API.uri(subdomain: "banks")
+      end
+
+      def self.api_uri
+        AruxApp::API.uri(subdomain: "banks.api")
       end
 
       def get(routing_number)

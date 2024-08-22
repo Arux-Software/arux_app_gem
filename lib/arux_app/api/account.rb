@@ -1,10 +1,6 @@
 module AruxApp
   module API
     class Account
-      def self.server_uri
-        AruxApp::API.server_uri
-      end
-
       attr_accessor :auth, :access_token, :api_version
 
       def initialize(options = {})
@@ -15,6 +11,14 @@ module AruxApp
         raise API::InitializerError.new(:auth_or_access_token, "can't be blank") if self.auth.nil? and self.access_token.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if self.auth and !self.auth.is_a?(AruxApp::API::Auth)
         raise API::InitializerError.new(:access_token, "must be of class type AruxApp::API::Auth::AccessToken") if self.access_token and !self.access_token.is_a?(AruxApp::API::Auth::AccessToken)
+      end
+
+      def self.public_uri
+        AruxApp::API.uri(subdomain: "account")
+      end
+
+      def self.api_uri
+        AruxApp::API.uri(subdomain: "account.api")
       end
 
       def list(params = {})

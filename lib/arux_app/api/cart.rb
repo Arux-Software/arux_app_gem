@@ -1,16 +1,6 @@
 module AruxApp
   module API
     class Cart
-      def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://cart.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://cart.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://cart.#{HOSTNAME}"
-        end
-      end
-
       attr_accessor :auth, :access_token
 
       def initialize(options = {})
@@ -19,6 +9,14 @@ module AruxApp
 
         raise API::InitializerError.new(:access_token, "can't be blank") if self.access_token.nil?
         raise API::InitializerError.new(:access_token, "must be of class type AruxApp::API::Auth::AccessToken") if !self.access_token.is_a?(AruxApp::API::Auth::AccessToken)
+      end
+
+      def self.public_uri
+        AruxApp::API.uri(subdomain: "cart")
+      end
+
+      def self.api_uri
+        AruxApp::API.uri(subdomain: "cart.api")
       end
 
       def get(uuid = nil)

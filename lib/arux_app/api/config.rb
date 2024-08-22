@@ -1,16 +1,6 @@
 module AruxApp
   module API
     class Config
-      def self.server_uri
-        if AruxApp::API.standardmode?
-          "https://config.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://config.arux.blue"
-        elsif AruxApp::API.devmode?
-          "http://config.#{HOSTNAME}"
-        end
-      end
-
       attr_accessor :auth
 
       def initialize(options = {})
@@ -18,6 +8,14 @@ module AruxApp
 
         raise API::InitializerError.new(:auth, "can't be blank") if self.auth.nil?
         raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if !self.auth.is_a?(AruxApp::API::Auth)
+      end
+
+      def self.public_uri
+        AruxApp::API.uri(subdomain: "config")
+      end
+
+      def self.api_uri
+        AruxApp::API.uri(subdomain: "config.api")
       end
 
       def get(subdomain_or_sn)
