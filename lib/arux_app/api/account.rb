@@ -211,7 +211,7 @@ module AruxApp
       protected
 
       def api_route
-        "#{self.class.server_uri}/api/v#{api_version}"
+        "#{self.class.api_uri}/api/v#{api_version}"
       end
 
       def generate_headers

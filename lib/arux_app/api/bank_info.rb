@@ -13,7 +13,7 @@ module AruxApp
         routing_number = AruxApp::API.uri_escape(routing_number.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/#{routing_number}"
+        request.url = "#{self.class.api_uri}/#{routing_number}"
         request.headers = {'User-Agent' => USER_AGENT}
 
         response = HTTPI.get(request)

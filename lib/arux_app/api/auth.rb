@@ -52,7 +52,7 @@ module AruxApp
       end
 
       def authorization_url(scope: "public")
-        base_uri = URI.parse("#{self.class.server_uri}/oauth/authorize")
+        base_uri = URI.parse("#{self.class.public_uri}/oauth/authorize")
         params = {
           scope: scope,
           response_type: "code",
@@ -73,7 +73,7 @@ module AruxApp
         }
 
         request = HTTPI::Request.new.tap do |req|
-          req.url = "#{self.class.server_uri}/oauth/token"
+          req.url = "#{self.class.public_uri}/oauth/token"
           req.body = params
           req.headers = { 'User-Agent' => USER_AGENT }
           req.auth.basic(username, password)
@@ -90,7 +90,7 @@ module AruxApp
       end
 
       def registration_url
-        %(#{self.class.server_uri}/users/registrations?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
+        %(#{self.class.public_uri}/users/registrations?client_id=#{self.client_id}&redirect_uri=#{self.redirect_uri}&district=#{self.district_subdomain})
       end
 
       def access_token(code)
@@ -103,7 +103,7 @@ module AruxApp
         }
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/oauth/token"
+        request.url = "#{self.class.api_uri}/oauth/token"
         request.body = data
         request.headers = {'User-Agent' => USER_AGENT}
 
@@ -139,7 +139,7 @@ module AruxApp
         }
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/oauth/token"
+        request.url = "#{self.class.api_uri}/oauth/token"
         request.body = data
         request.headers = {'User-Agent' => USER_AGENT}
 

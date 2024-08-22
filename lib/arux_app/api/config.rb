@@ -22,7 +22,7 @@ module AruxApp
         subdomain_or_sn = AruxApp::API.uri_escape(subdomain_or_sn.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/v1/customers/#{subdomain_or_sn}"
+        request.url = "#{self.class.api_uri}/v1/customers/#{subdomain_or_sn}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -39,7 +39,7 @@ module AruxApp
         value = AruxApp::API.uri_escape(value.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.server_uri}/v1/customers/by/#{key}/#{value}"
+        request.url = "#{self.class.api_uri}/v1/customers/by/#{key}/#{value}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
