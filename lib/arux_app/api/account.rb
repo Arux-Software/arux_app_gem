@@ -139,62 +139,6 @@ module AruxApp
         end
       end
 
-      def list_user_locks(user_uuid)
-        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{user_uuid}/locks"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
-          JSON.parse(response.body)
-        else
-          raise(API::Error.new(response.code, response.body))
-        end
-      end
-
-      def add_user_lock(user_uuid, scope, reason = "")
-        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}/locks"
-        request.body = {
-          user_lock: {
-            scope: scope,
-            reason: reason
-          }
-        }.to_json
-        request.headers = self.generate_headers
-
-        response = HTTPI.post(request)
-
-        if response.code == 201
-          true
-        elsif !response.error?
-          JSON.parse(response.body)
-        else
-          raise(API::Error.new(response.code, response.body))
-        end
-      end
-
-      def delete_user_lock(user_uuid, lock_id)
-        uuid = AruxApp::API.uri_escape(user_uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}/locks/#{lock_id}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.delete(request)
-
-        if !response.error?
-          JSON.parse(response.body)
-        else
-          raise(API::Error.new(response.code, response.body))
-        end
-      end
-
       # TODO:: create mapping for relationships api endpoints
       def list_relationships
       end
