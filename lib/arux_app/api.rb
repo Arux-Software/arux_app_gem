@@ -1,29 +1,27 @@
 module AruxApp
   module API
+    DOMAINS = {
+      production: "arux.app",
+      staging: "arux.blue",
+      development: HOSTNAME,
+      test: "arux.test"
+    }
+
     class << self
-      @@mode = :standard
-      [:test, :dev, :standard].each do |m|
-        define_method("#{m}mode?") do
-          @@mode == m
-        end
-
-        define_method("#{m}mode") do
-          @@mode == m
-        end
-
-        define_method("#{m}mode=") do |b|
-          @@mode = b ? m : :standard
-        end
+      def mode
+        raise "Environment is not set, i.e. ARUX_APP_GEM_MODE = :development" unless const_defined?(:ARUX_APP_GEM_MODE)
+        ARUX_APP_GEM_MODE
       end
 
-      def server_uri
-        if AruxApp::API.standardmode?
-          "https://account.arux.app"
-        elsif AruxApp::API.testmode?
-          "https://account.arux.blue"
-        elsif AruxApp::API.devmode?
-          "https://account.#{HOSTNAME}"
-        end
+      def uri(subdomain:)
+        URI::HTTPS.build(
+          host: [subdomain, domain].join('.'),
+        )
+      end
+
+      def domain
+        raise "#{mode} is not a supported environment" unless DOMAINS.has_key?(mode)
+        DOMAINS[mode]
       end
 
       def uri_escape(str)
