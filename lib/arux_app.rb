@@ -14,9 +14,7 @@ require "arux_app/api/checkout"
 require "arux_app/api/bank_info"
 require "arux_app/api/config"
 require "arux_app/api/auth"
-require "arux_app/api/nav"
 require "arux_app/api/account"
-require "arux_app/api/student"
 require "arux_app/api/cart"
 
 module AruxApp
