@@ -14,15 +14,23 @@ module AruxApp
         AruxApp::API.uri(subdomain: "config")
       end
 
+      def public_uri
+        self.class.public_uri
+      end
+
       def self.api_uri
         AruxApp::API.uri(subdomain: "config.api")
+      end
+
+      def api_uri
+        self.class.api_uri
       end
 
       def get(subdomain_or_sn)
         subdomain_or_sn = AruxApp::API.uri_escape(subdomain_or_sn.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}/v1/customers/#{subdomain_or_sn}"
+        request.url = "#{api_uri}/v1/customers/#{subdomain_or_sn}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -39,7 +47,7 @@ module AruxApp
         value = AruxApp::API.uri_escape(value.to_s)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}/v1/customers/by/#{key}/#{value}"
+        request.url = "#{api_uri}/v1/customers/by/#{key}/#{value}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)

@@ -7,8 +7,16 @@ module AruxApp
         AruxApp::API.uri(subdomain: "pay")
       end
 
+      def public_uri
+        self.class.public_uri
+      end
+
       def self.api_uri
         AruxApp::API.uri(subdomain: "pay.api")
+      end
+
+      def api_uri
+        self.class.api_uri
       end
 
       def self.api_route

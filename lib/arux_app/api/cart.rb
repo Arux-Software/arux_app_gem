@@ -15,8 +15,16 @@ module AruxApp
         AruxApp::API.uri(subdomain: "cart")
       end
 
+      def public_uri
+        self.class.public_uri
+      end
+
       def self.api_uri
         AruxApp::API.uri(subdomain: "cart.api")
+      end
+
+      def api_uri
+        self.class.api_uri
       end
 
       def get(uuid = nil)
@@ -27,7 +35,7 @@ module AruxApp
         end
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -43,7 +51,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/status)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -59,7 +67,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/items)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -75,7 +83,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/items/#{item_identifier})
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.get(request)
@@ -91,7 +99,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/items)
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
@@ -111,7 +119,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
@@ -131,7 +139,7 @@ module AruxApp
         path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
 
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.delete(request)
@@ -146,7 +154,7 @@ module AruxApp
       def destroy(uuid)
         path = "/api/#{self.generate_cart_path}/carts/#{uuid}"
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
 
         response = HTTPI.delete(request)
@@ -161,7 +169,7 @@ module AruxApp
       def create(params)
         path = "/api/#{self.generate_cart_path}/carts"
         request = HTTPI::Request.new
-        request.url = "#{self.class.api_uri}#{path}"
+        request.url = "#{api_uri}#{path}"
         request.headers = self.generate_headers
         request.body = params.to_json
 

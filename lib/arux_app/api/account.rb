@@ -17,8 +17,16 @@ module AruxApp
         AruxApp::API.uri(subdomain: "account")
       end
 
+      def public_uri
+        self.class.public_uri
+      end
+
       def self.api_uri
         AruxApp::API.uri(subdomain: "account.api")
+      end
+
+      def api_uri
+        self.class.api_uri
       end
 
       def list(params = {})
@@ -155,7 +163,7 @@ module AruxApp
       protected
 
       def api_route
-        "#{self.class.api_uri}/api/v#{api_version}"
+        "#{api_uri}/api/v#{api_version}"
       end
 
       def generate_headers
