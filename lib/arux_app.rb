@@ -6,9 +6,9 @@ HOSTNAME = if ENV.has_key?("DEV_HOST")
              `hostname`.downcase.strip
            end
 
-require 'rubygems'
-require 'httpi'
-require 'json'
+require "rubygems"
+require "httpi"
+require "json"
 require "arux_app/api"
 require "arux_app/api/checkout"
 require "arux_app/api/bank_info"
