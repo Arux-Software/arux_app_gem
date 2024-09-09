@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name           = "arux_app"
-  spec.version        = "3.0.0"
+  spec.version        = "3.0.1"
   spec.authors        = ["Arux Software"]
   spec.email          = ["sheuer@aruxsoftware.com"]
   spec.summary        = "Ruby gem for interacting with the Arux.app Switchboard APIs."
@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files     = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths  = ["lib"]
   
-  spec.add_runtime_dependency "httpi", "~> 2.4"
+  spec.add_runtime_dependency "httpi", "~> 3.0"
   spec.add_runtime_dependency "json", ">= 0"
 
   spec.add_development_dependency "bundler", ">= 1.14"
