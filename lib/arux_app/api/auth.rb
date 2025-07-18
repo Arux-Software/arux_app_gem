@@ -37,12 +37,11 @@ module AruxApp
         self.element = options[:element]
         self.district_subdomain = options[:district_subdomain]
         self.current_user_uuid = options[:current_user_uuid]
+        self.api_key = options[:api_key]
 
         raise API::InitializerError.new(:client_id, "can't be blank") if self.client_id.to_s.empty?
         raise API::InitializerError.new(:client_secret, "can't be blank") if self.client_secret.to_s.empty?
         raise API::InitializerError.new(:redirect_uri, "can't be blank") if self.redirect_uri.to_s.empty?
-
-        self.api_key = options[:api_key]
       end
 
       def self.public_uri
