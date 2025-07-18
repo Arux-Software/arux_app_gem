@@ -6,8 +6,8 @@ module AruxApp
       def initialize(options = {})
         self.auth = options[:auth]
 
-        raise API::InitializerError.new(:auth, "can't be blank") if auth.nil?
-        raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if !auth.is_a?(AruxApp::API::Auth)
+        raise API::InitializerError.new(:auth, "can't be blank") if self.auth.nil?
+        raise API::InitializerError.new(:auth, "must be of class type AruxApp::API::Auth") if !self.auth.is_a?(AruxApp::API::Auth)
       end
 
       def self.public_uri
@@ -31,7 +31,7 @@ module AruxApp
 
         request = HTTPI::Request.new
         request.url = "#{api_uri}/v1/customers/#{subdomain_or_sn}"
-        request.headers = generate_headers
+        request.headers = self.generate_headers
 
         response = HTTPI.get(request)
 
@@ -48,7 +48,7 @@ module AruxApp
 
         request = HTTPI::Request.new
         request.url = "#{api_uri}/v1/customers/by/#{key}/#{value}"
-        request.headers = generate_headers
+        request.headers = self.generate_headers
 
         response = HTTPI.get(request)
 
@@ -75,12 +75,7 @@ module AruxApp
       protected
 
       def generate_headers
-        {
-          "User-Agent": USER_AGENT,
-          "Client-Secret": auth.client_secret,
-          "Client-Id": auth.client_id,
-          key: auth.api_key
-        }
+        {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id, key: auth.api_key}
       end
     end
   end
