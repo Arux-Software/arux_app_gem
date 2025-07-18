@@ -26,7 +26,7 @@ module AruxApp
         end
       end
 
-      attr_accessor :client_id, :client_secret, :redirect_uri, :js_callback, :district_subdomain, :current_user_uuid, :login_mechanism, :element
+      attr_accessor :client_id, :client_secret, :redirect_uri, :js_callback, :district_subdomain, :current_user_uuid, :login_mechanism, :element, :api_key
 
       def initialize(options = {})
         self.client_id = options[:client_id]
@@ -41,6 +41,8 @@ module AruxApp
         raise API::InitializerError.new(:client_id, "can't be blank") if self.client_id.to_s.empty?
         raise API::InitializerError.new(:client_secret, "can't be blank") if self.client_secret.to_s.empty?
         raise API::InitializerError.new(:redirect_uri, "can't be blank") if self.redirect_uri.to_s.empty?
+
+        self.api_key = options[:api_key]
       end
 
       def self.public_uri
