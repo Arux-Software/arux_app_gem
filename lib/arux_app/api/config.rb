@@ -75,7 +75,12 @@ module AruxApp
       protected
 
       def generate_headers
-        {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id, key: auth.api_key}
+        {
+          'User-Agent' => USER_AGENT,
+          'Client-Secret' => self.auth.client_secret,
+          'Client-Id' => self.auth.client_id,
+          'Key' => self.auth.api_key
+        }
       end
     end
   end
