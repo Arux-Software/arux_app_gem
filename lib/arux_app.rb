@@ -18,6 +18,6 @@ require "arux_app/api/account"
 require "arux_app/api/cart"
 
 module AruxApp
-  VERSION = "3.0.1"
+  VERSION = "3.0.3"
   USER_AGENT = "Arux.app GEM #{VERSION}"
 end

@@ -59,12 +59,29 @@ module AruxApp
         end
       end
 
+      def list(params = {})
+        request = HTTPI::Request.new
+        request.url = "#{api_uri}/v1/p/customers"
+        request.query = URI.encode_www_form(params)
+        request.headers = generate_headers
+        response = HTTPI.get(request)
+        if !response.error?
+          JSON.parse(response.body)
+        else
+          raise(API::Error.new(response.code, response.body))
+        end
+      end
+
       protected
 
       def generate_headers
-        {'User-Agent' => USER_AGENT, 'Client-Secret' => self.auth.client_secret, 'Client-Id' => self.auth.client_id}
+        {
+          'User-Agent' => USER_AGENT,
+          'Client-Secret' => self.auth.client_secret,
+          'Client-Id' => self.auth.client_id,
+          'Key' => self.auth.api_key
+        }
       end
-
     end
   end
 end
