@@ -5,7 +5,7 @@ module AruxApp
         production: "arux.blue",
         staging: "arux.blue",
         development: HOSTNAME,
-        test: "arux.test" # do we really need this?
+        test: "arux.test"
       }
 
       def self.public_uri
