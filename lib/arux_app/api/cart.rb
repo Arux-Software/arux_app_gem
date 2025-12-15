@@ -34,16 +34,14 @@ module AruxApp
           path = %(/api/#{self.generate_cart_path})
         end
 
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = self.generate_headers
+        end
+        response = conn.get(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
