@@ -28,47 +28,40 @@ module AruxApp
 
       def get(subdomain_or_sn)
         subdomain_or_sn = AruxApp::API.uri_escape(subdomain_or_sn.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/v1/customers/#{subdomain_or_sn}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = self.generate_headers
+        end
+        response = conn.get("/v1/customers/#{subdomain_or_sn}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def get_by(key, value)
         key = AruxApp::API.uri_escape(key.to_s)
         value = AruxApp::API.uri_escape(value.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/v1/customers/by/#{key}/#{value}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = self.generate_headers
+        end
+        response = conn.get("/v1/customers/by/#{key}/#{value}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def list(params = {})
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/v1/p/customers"
-        request.query = URI.encode_www_form(params)
-        request.headers = generate_headers
-        response = HTTPI.get(request)
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = generate_headers
+        end
+        response = conn.get("/v1/p/customers?#{URI.encode_www_form(params)}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
