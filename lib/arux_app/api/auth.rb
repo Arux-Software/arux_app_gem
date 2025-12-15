@@ -80,17 +80,19 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-
-        request = HTTPI::Request.new.tap do |req|
-          req.url = "#{public_uri}/oauth/token"
-          req.body = params
-          req.headers = { 'User-Agent' => USER_AGENT }
-          req.auth.basic(username, password)
+        conn = Faraday.new(url: public_uri) do |f|
+          f.headers = { 'User-Agent' => USER_AGENT }
         end
-
-        response = HTTPI.post(request)
-        raise(API::Error.new(response.code, response.body)) if response.error?
-
+        response = conn.post('/oauth/token') do |req|
+          req.body = URI.encode_www_form(params)
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+          req.options[:timeout] = 10
+          req.options[:open_timeout] = 5
+          req.basic_auth(username, password)
+        end
+        if response.status >= 400
+          raise(API::Error.new(response.status, response.body))
+        end
         AccessToken.new(
           token: JSON.parse(response.body)['access_token'],
           scope: JSON.parse(response.body)['scope'],
@@ -110,15 +112,14 @@ module AruxApp
           :client_secret => self.client_secret,
           :client_id => self.client_id
         }
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/oauth/token"
-        request.body = data
-        request.headers = {'User-Agent' => USER_AGENT}
-
-        response = HTTPI.post(request)
-
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = {'User-Agent' => USER_AGENT}
+        end
+        response = conn.post('/oauth/token') do |req|
+          req.body = URI.encode_www_form(data)
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        end
+        if response.status < 400
           AccessToken.new(
             token: JSON.parse(response.body)['access_token'],
             scope: JSON.parse(response.body)['scope'],
@@ -129,12 +130,12 @@ module AruxApp
             resp_data = JSON.parse(response.body)
           rescue
           end
-          if resp_data and resp_data["error"] == "invalid_grant"
-            raise(API::Auth::InvalidGrantError.new(response.code, response.body))
-          elsif resp_data and resp_data["error"] == "invalid_client"
-            raise(API::Auth::InvalidClientError.new(response.code, response.body))
+          if resp_data && resp_data["error"] == "invalid_grant"
+            raise(API::Auth::InvalidGrantError.new(response.status, response.body))
+          elsif resp_data && resp_data["error"] == "invalid_client"
+            raise(API::Auth::InvalidClientError.new(response.status, response.body))
           else
-            raise(API::Error.new(response.code, response.body))
+            raise(API::Error.new(response.status, response.body))
           end
         end
       end
@@ -146,17 +147,17 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/oauth/token"
-        request.body = data
-        request.headers = {'User-Agent' => USER_AGENT}
-
-        response = HTTPI.post(request)
-        if !response.error?
+        conn = Faraday.new(url: api_uri) do |f|
+          f.headers = {'User-Agent' => USER_AGENT}
+        end
+        response = conn.post('/oauth/token') do |req|
+          req.body = URI.encode_www_form(data)
+          req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+        end
+        if response.status < 400
           AccessToken.new(:token => JSON.parse(response.body)['access_token'], auth: self)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
