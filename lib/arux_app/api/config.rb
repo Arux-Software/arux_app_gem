@@ -26,11 +26,18 @@ module AruxApp
         self.class.api_uri
       end
 
+      def self.connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
+      def connection
+        self.class.connection
+      end
+
       def get(subdomain_or_sn)
         subdomain_or_sn = AruxApp::API.uri_escape(subdomain_or_sn.to_s)
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("/v1/customers/#{subdomain_or_sn}")
         if response.status < 400
           JSON.parse(response.body)
@@ -42,9 +49,8 @@ module AruxApp
       def get_by(key, value)
         key = AruxApp::API.uri_escape(key.to_s)
         value = AruxApp::API.uri_escape(value.to_s)
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("/v1/customers/by/#{key}/#{value}")
         if response.status < 400
           JSON.parse(response.body)
@@ -54,9 +60,8 @@ module AruxApp
       end
 
       def list(params = {})
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("/v1/p/customers?#{URI.encode_www_form(params)}")
         if response.status < 400
           JSON.parse(response.body)
