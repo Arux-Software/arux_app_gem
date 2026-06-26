@@ -57,7 +57,7 @@ module AruxApp
         conn = Faraday.new(url: api_uri) do |f|
           f.headers = generate_headers
         end
-        response = conn.get("/v1/p/customers?#{URI.encode_www_form(params)}")
+        response = conn.get("/v1/p/customers", params)
         if response.status < 400
           JSON.parse(response.body)
         else
