@@ -34,7 +34,7 @@ module AruxApp
       end
 
       def connection
-        AruxApp::API.connection(uri: api_route)
+        self.class.connection
       end
 
       def list(params = {})
