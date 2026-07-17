@@ -33,7 +33,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users?#{URI.encode_www_form(params)}")
+        response = conn.get("/users", params)
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -46,7 +46,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users/#{uuid}?#{URI.encode_www_form(params)}")
+        response = conn.get("/users/#{uuid}", params)
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -115,7 +115,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users/owner?#{URI.encode_www_form(params)}")
+        response = conn.get("/users/owner", params)
         if response.status < 400
           JSON.parse(response.body)
         else

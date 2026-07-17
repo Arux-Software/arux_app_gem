@@ -7,6 +7,8 @@ HOSTNAME = if ENV.has_key?("DEV_HOST")
            end
 
 require 'rubygems'
+require 'uri'
+require 'cgi'
 require 'faraday'
 require 'json'
 require "arux_app/api"
