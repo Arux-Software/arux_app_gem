@@ -33,7 +33,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users", params)
+        response = conn.get("users", params)
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -46,7 +46,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users/#{uuid}", params)
+        response = conn.get("users/#{uuid}", params)
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -58,7 +58,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.post("/users/", params.to_json)
+        response = conn.post("users", params.to_json)
         if response.status == 201
           true
         elsif response.status < 400
@@ -73,7 +73,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.put("/users/#{uuid}", params.to_json)
+        response = conn.put("users/#{uuid}", params.to_json)
         if response.status == 204
           true
         elsif response.status < 400
@@ -89,7 +89,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.put("/users/merge/#{uuid1}/#{uuid2}")
+        response = conn.put("users/merge/#{uuid1}/#{uuid2}")
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -102,7 +102,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.delete("/users/#{uuid}")
+        response = conn.delete("users/#{uuid}")
         if response.status < 400
           JSON.parse(response.body)
         else
@@ -115,7 +115,7 @@ module AruxApp
         conn = Faraday.new(url: api_route) do |f|
           f.headers = self.generate_headers
         end
-        response = conn.get("/users/owner", params)
+        response = conn.get("users/owner", params)
         if response.status < 400
           JSON.parse(response.body)
         else

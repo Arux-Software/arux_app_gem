@@ -80,15 +80,14 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-        conn = Faraday.new(url: public_uri) do |f|
-          f.headers = { 'User-Agent' => USER_AGENT }
+        conn = Faraday.new(url: public_uri, headers: { 'User-Agent' => USER_AGENT }) do |f|
+          f.request :authorization, :basic, username, password
         end
         response = conn.post('/oauth/token') do |req|
           req.body = URI.encode_www_form(params)
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
           req.options[:timeout] = 10
           req.options[:open_timeout] = 5
-          req.basic_auth(username, password)
         end
         if response.status >= 400
           raise(API::Error.new(response.status, response.body))
