@@ -29,10 +29,13 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_route)
+      end
+
       def list(params = {})
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("users", params)
         if response.status < 400
           JSON.parse(response.body)
@@ -43,9 +46,8 @@ module AruxApp
 
       def get(uuid, params = {})
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("users/#{uuid}", params)
         if response.status < 400
           JSON.parse(response.body)
@@ -55,9 +57,8 @@ module AruxApp
       end
 
       def create(params)
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.post("users", params.to_json)
         if response.status == 201
           true
@@ -70,9 +71,8 @@ module AruxApp
 
       def update(uuid, params)
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.put("users/#{uuid}", params.to_json)
         if response.status == 204
           true
@@ -86,9 +86,8 @@ module AruxApp
       def merge(uuid1, uuid2)
         uuid1 = AruxApp::API.uri_escape(uuid1)
         uuid2 = AruxApp::API.uri_escape(uuid2)
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.put("users/merge/#{uuid1}/#{uuid2}")
         if response.status < 400
           JSON.parse(response.body)
@@ -99,9 +98,8 @@ module AruxApp
 
       def delete(uuid)
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.delete("users/#{uuid}")
         if response.status < 400
           JSON.parse(response.body)
@@ -112,9 +110,8 @@ module AruxApp
 
       def owner(params = {})
         raise API::RequirementError.new(:access_token, "can't be blank") if self.access_token.nil?
-        conn = Faraday.new(url: api_route) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get("users/owner", params)
         if response.status < 400
           JSON.parse(response.body)

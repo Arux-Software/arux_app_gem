@@ -60,6 +60,10 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
       def authorization_url(scope: "public")
         base_uri = URI.parse("#{public_uri}/oauth/authorize")
         params = {
@@ -80,7 +84,7 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-        conn = Faraday.new(url: public_uri, headers: { 'User-Agent' => USER_AGENT }) do |f|
+        conn = AruxApp::API.connection(uri: public_uri) do |f|
           f.request :authorization, :basic, username, password
         end
         response = conn.post('/oauth/token') do |req|
@@ -111,9 +115,7 @@ module AruxApp
           :client_secret => self.client_secret,
           :client_id => self.client_id
         }
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = {'User-Agent' => USER_AGENT}
-        end
+        conn = connection
         response = conn.post('/oauth/token') do |req|
           req.body = URI.encode_www_form(data)
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
@@ -146,9 +148,7 @@ module AruxApp
           client_id: client_id,
           client_secret: client_secret
         }
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = {'User-Agent' => USER_AGENT}
-        end
+        conn = connection
         response = conn.post('/oauth/token') do |req|
           req.body = URI.encode_www_form(data)
           req.headers['Content-Type'] = 'application/x-www-form-urlencoded'

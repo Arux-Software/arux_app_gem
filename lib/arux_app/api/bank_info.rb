@@ -17,11 +17,13 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
       def get(routing_number)
         routing_number = AruxApp::API.uri_escape(routing_number.to_s)
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = {'User-Agent' => USER_AGENT}
-        end
+        conn = connection
         response = conn.get("/#{routing_number}")
         if response.status < 400
           JSON.parse(response.body)

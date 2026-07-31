@@ -27,6 +27,10 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
       def get(uuid = nil)
         if uuid
           path = %(/api/#{AruxApp::API.uri_escape(uuid)})
@@ -34,9 +38,8 @@ module AruxApp
           path = %(/api/#{self.generate_cart_path})
         end
 
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -48,9 +51,8 @@ module AruxApp
       def get_status
         path = %(/api/#{self.generate_cart_path}/status)
 
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -62,9 +64,8 @@ module AruxApp
       def get_items
         path = %(/api/#{self.generate_cart_path}/items)
 
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -76,9 +77,8 @@ module AruxApp
       def get_item(item_identifier)
         path = %(/api/#{self.generate_cart_path}/items/#{item_identifier})
 
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.get(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -92,9 +92,8 @@ module AruxApp
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.post(path, params.to_json)
         if response.status < 400
           JSON.parse(response.body)
@@ -108,9 +107,8 @@ module AruxApp
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.put(path, params.to_json)
         if response.status < 400
           JSON.parse(response.body)
@@ -121,9 +119,8 @@ module AruxApp
 
       def delete_item(item_identifier)
         path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.delete(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -134,9 +131,8 @@ module AruxApp
 
       def destroy(uuid)
         path = "/api/#{self.generate_cart_path}/carts/#{uuid}"
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.delete(path)
         if response.status < 400
           JSON.parse(response.body)
@@ -147,9 +143,8 @@ module AruxApp
 
       def create(params)
         path = "/api/#{self.generate_cart_path}/carts"
-        conn = Faraday.new(url: api_uri) do |f|
-          f.headers = self.generate_headers
-        end
+        conn = connection
+        conn.headers.merge!(generate_headers)
         response = conn.post(path, params.to_json)
         if response.status < 400
           JSON.parse(response.body)
