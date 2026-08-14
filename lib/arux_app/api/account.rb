@@ -29,121 +29,94 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_route)
+      end
+
       def list(params = {})
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users"
-        request.query = URI.encode_www_form(params)
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get("users", params)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def get(uuid, params = {})
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}"
-        request.query = URI.encode_www_form(params)
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get("users/#{uuid}", params)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def create(params)
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/"
-        request.body = params.to_json
-        request.headers = self.generate_headers
-
-        response = HTTPI.post(request)
-
-        if response.code == 201
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.post("users", params.to_json)
+        if response.status == 201
           true
-        elsif !response.error?
+        elsif response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def update(uuid, params)
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}"
-        request.body = params.to_json
-        request.headers = self.generate_headers
-
-        response = HTTPI.put(request)
-
-        if response.code == 204
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.put("users/#{uuid}", params.to_json)
+        if response.status == 204
           true
-        elsif !response.error?
+        elsif response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def merge(uuid1, uuid2)
         uuid1 = AruxApp::API.uri_escape(uuid1)
         uuid2 = AruxApp::API.uri_escape(uuid2)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/merge/#{uuid1}/#{uuid2}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.put(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.put("users/merge/#{uuid1}/#{uuid2}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def delete(uuid)
         uuid = AruxApp::API.uri_escape(uuid.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/#{uuid}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.delete(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.delete("users/#{uuid}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
       def owner(params = {})
         raise API::RequirementError.new(:access_token, "can't be blank") if self.access_token.nil?
-
-        request = HTTPI::Request.new
-        request.url = "#{api_route}/users/owner"
-        request.query = URI.encode_www_form(params)
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get("users/owner", params)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 

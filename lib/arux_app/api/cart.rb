@@ -27,6 +27,10 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
       def get(uuid = nil)
         if uuid
           path = %(/api/#{AruxApp::API.uri_escape(uuid)})
@@ -34,151 +38,118 @@ module AruxApp
           path = %(/api/#{self.generate_cart_path})
         end
 
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def get_status
         path = %(/api/#{self.generate_cart_path}/status)
 
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def get_items
         path = %(/api/#{self.generate_cart_path}/items)
 
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def get_item(item_identifier)
         path = %(/api/#{self.generate_cart_path}/items/#{item_identifier})
 
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.get(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def add_item(params)
         path = %(/api/#{self.generate_cart_path}/items)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
-        request.body = params.to_json
-        request.headers = self.generate_headers
-
-        response = HTTPI.post(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.post(path, params.to_json)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def update_item(item_identifier, params)
         path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
         if params.keys.first.to_s != 'item'
           params = {:item => params}
         end
-        request.body = params.to_json
-        request.headers = self.generate_headers
-
-        response = HTTPI.put(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.put(path, params.to_json)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def delete_item(item_identifier)
         path = %(/api/#{self.generate_cart_path}/items/#{AruxApp::API.uri_escape(item_identifier)})
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.delete(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.delete(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def destroy(uuid)
         path = "/api/#{self.generate_cart_path}/carts/#{uuid}"
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-
-        response = HTTPI.delete(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.delete(path)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 
       def create(params)
         path = "/api/#{self.generate_cart_path}/carts"
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}#{path}"
-        request.headers = self.generate_headers
-        request.body = params.to_json
-
-        response = HTTPI.post(request)
-
-        if !response.error?
+        conn = connection
+        conn.headers.merge!(generate_headers)
+        response = conn.post(path, params.to_json)
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, JSON.parse(response.body)["message"]))
+          raise(API::Error.new(response.status, JSON.parse(response.body)["message"]))
         end
       end
 

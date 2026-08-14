@@ -7,7 +7,9 @@ HOSTNAME = if ENV.has_key?("DEV_HOST")
            end
 
 require 'rubygems'
-require 'httpi'
+require 'uri'
+require 'cgi'
+require 'faraday'
 require 'json'
 require "arux_app/api"
 require "arux_app/api/checkout"
@@ -18,6 +20,6 @@ require "arux_app/api/account"
 require "arux_app/api/cart"
 
 module AruxApp
-  VERSION = "3.0.3"
+  VERSION = "3.1.0"
   USER_AGENT = "Arux.app GEM #{VERSION}"
 end

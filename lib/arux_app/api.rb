@@ -24,6 +24,13 @@ module AruxApp
         DOMAINS[mode]
       end
 
+      def connection(uri:)
+        Faraday.new(url: uri) do |f|
+          f.headers = {'User-Agent' => USER_AGENT}
+          yield f if block_given?
+        end
+      end
+
       def uri_escape(str)
         # URI.escape was deprecated and removed in ruby
         # https://bugs.ruby-lang.org/issues/17309

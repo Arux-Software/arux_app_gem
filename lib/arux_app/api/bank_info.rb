@@ -17,19 +17,18 @@ module AruxApp
         self.class.api_uri
       end
 
+      def connection
+        AruxApp::API.connection(uri: api_uri)
+      end
+
       def get(routing_number)
         routing_number = AruxApp::API.uri_escape(routing_number.to_s)
-
-        request = HTTPI::Request.new
-        request.url = "#{api_uri}/#{routing_number}"
-        request.headers = {'User-Agent' => USER_AGENT}
-
-        response = HTTPI.get(request)
-
-        if !response.error?
+        conn = connection
+        response = conn.get("/#{routing_number}")
+        if response.status < 400
           JSON.parse(response.body)
         else
-          raise(API::Error.new(response.code, response.body))
+          raise(API::Error.new(response.status, response.body))
         end
       end
 
