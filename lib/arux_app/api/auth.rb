@@ -73,6 +73,7 @@ module AruxApp
           redirect_uri: redirect_uri,
           district: district_subdomain
         }
+        params.delete(:district) if district_subdomain.to_s.empty?
         base_uri.query = URI.encode_www_form(params)
         base_uri.to_s
       end
